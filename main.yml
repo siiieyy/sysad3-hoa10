@@ -1,0 +1,60 @@
+---
+- hosts: router
+  connection: network_cli
+  become: true
+  gather_facts: no
+  tasks:
+
+  - name: Change hostname of router
+    ios_config:
+      lines:
+        - hostname Router1
+    become: yes
+    become_method: enable
+
+  - name: service password-encryption on router
+    ios_config:
+      lines:
+        - service password-encryption
+    become: yes
+    become_method: enable
+
+  - name: Configure banner motd of router
+    ios_banner:
+      banner: login
+      text: |
+        Access prohibited, authorized personnel only.
+    become: yes
+    become_method: enable
+
+  - name: Configure line console 0
+    ios_config:
+      lines:
+        - password cisco
+        - login
+      parents: line console 0
+    become: yes
+    become_method: enable
+
+  - name: enable secret password on router
+    ios_config:
+      lines:
+        - enable secret cisco
+    become: yes
+    become_method: enable
+
+  - name: Configure ip address of port f0/0 on router
+    ios_config:
+      lines:
+        - ip address 192.168.122.34 255.255.255.0
+        - no shutdown
+      parents: interface f0/0
+    become: yes
+    become_method: enable
+
+  - name: saving configuration on router
+    ios_config:
+      lines:
+        - do write memory
+    become: yes
+    become_method: enable
